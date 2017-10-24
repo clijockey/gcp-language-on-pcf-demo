@@ -1,0 +1,9 @@
+---
+applications:
+- name: google-language-api-demo
+  memory: 1024M
+  instances: 1
+  buildpack: java_buildpack
+  path: target/googledemo-0.0.1-SNAPSHOT.jar
+  services: [ machine-learning ]
+random-route: true
