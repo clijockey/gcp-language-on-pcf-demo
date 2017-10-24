@@ -15,9 +15,17 @@ Compile this code:
 ```
 $ ./build.sh
 ```
-Push it!
+Push it without starting:
 ```
-$ cf push
+$ cf push --no-start
+```
+Now bind the Google service with the Developer role:
+```
+$ cf bind-service google-language-api-demo machine-learning -c '{"role": "ml.developer"}'
+```
+Finally start it!
+```
+cf start google-language-api-demo
 ```
 
 ## Testing
