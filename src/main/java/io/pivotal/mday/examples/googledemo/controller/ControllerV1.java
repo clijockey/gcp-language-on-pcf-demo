@@ -5,10 +5,14 @@
  */
 package io.pivotal.mday.examples.googledemo.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.cloud.translate.Language;
 
 import io.pivotal.mday.examples.googledemo.model.SentimentModel;
 import io.pivotal.mday.examples.googledemo.model.TranslateModel;
@@ -38,6 +42,16 @@ public class ControllerV1 {
 	@GetMapping("/sentiment/{text}")
 	public SentimentModel sentiment(@PathVariable("text") String text) {
 		return services.sentiment(text);
+	}
+
+	@GetMapping("/languages")
+	public List<Language> getLanguages() {
+		return services.getLanguages();
+	}
+
+	@GetMapping("/languages/{language}")
+	public List<Language> getLanguageSupport(@PathVariable("language") String language) {
+		return services.getLanguages(language);
 	}
 
 }

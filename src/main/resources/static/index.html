@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Google Language and Translate Demo</title>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script src="webjars/chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="webjars/chosen/chosen.css">
+<script type="text/javascript">
+	function translate(source, destination, message) {
+		$("#responseBox").text("Loading...");
+		$.when(
+				$.ajax({
+					url : "/v1/translate/" + source + "/" + destination + "/"
+							+ message,
+					dataType : "json",
+					async : true
+				})).done(function(response) {
+			populateResponse(response);
+		});
+	}
+	function populateResponse(response) {
+		$("#responseBox").text(response.translatedText);
+	}
+
+	function sentiment(message) {
+		$("#sentimentBox").text("Loading...");
+		$.when($.ajax({
+			url : "/v1/sentiment/" + message,
+			dataType : "json",
+			async : true
+		})).done(function(response) {
+			populateSentimentResponse(response);
+		});
+	}
+	function populateSentimentResponse(response) {
+		$("#sentimentBox").text(response.sentiment);
+	}
+
+	function loadSourceLanguages(jsonData) {
+		$.each(jsonData, function(key, value) {
+			//alert(value.code);
+			$("#source").append(
+					$('<option></option>').val(value.code).html(value.name));
+		})
+		$('#source').trigger("chosen:updated");
+	}
+
+	function loadDestinationLanguages(jsonData) {
+		$.each(jsonData, function(key, value) {
+			//alert(value.code);
+			$("#destination").append(
+					$('<option></option>').val(value.code).html(value.name));
+		})
+		$('#destination').trigger("chosen:updated");
+	}
+
+	// Load callback for onsubmit
+	$(document).ready(
+			function() {
+				$.when($.ajax({
+					url : "/v1/languages",
+					dataType : "json",
+					async : true
+				})).done(
+						function(jsonData) {
+							loadSourceLanguages(jsonData);
+							loadDestinationLanguages(jsonData);
+							// Select English as default source:
+							$('select[id^="source"] option[value="en"]').attr(
+									"selected", "selected");
+							$('#source').trigger("chosen:updated");
+							// Select French as default destination:
+							$('select[id^="destination"] option[value="fr"]')
+									.attr("selected", "selected");
+							$('#destination').trigger("chosen:updated");
+						});
+
+				$(".chosen-select").chosen();
+				$("#translateForm").submit(
+						function(event) {
+							translate($("#source").val(), $("#destination")
+									.val(), $("#translate").val());
+							event.preventDefault();
+						});
+				$("#sentimentForm").submit(function(event) {
+					sentiment($("#sentiment").val());
+					event.preventDefault();
+				});
+			});
+</script>
+</head>
+<body>
+	<h1>Google Language and Translate API on PCF Example</h1>
+	<h2>Translation</h2>
+	<form id="translateForm">
+		<table>
+			<tr>
+				<td><label for="source">Source: </label></td>
+				<td><select id="source" class="chosen-select" style="width: 20em;"></select></td>
+			</tr>
+			<tr>
+				<td><label for="destination">Destination: </label></td>
+				<td><select id="destination" class="chosen-select" style="width: 20em;"></select></td>
+			</tr>
+			<tr>
+				<td><label for="translate" style="padding-right: 2em;">Text: </label></td>
+				<td><input id="translate" />
+					<button type="submit">Go!</button></td>
+			</tr>
+			<tr>
+				<td>Response:</td>
+				<td><div id="responseBox"></div></td>
+			</tr>
+		</table>
+	</form>
+	<h2>Sentiment</h2>
+	<form id="sentimentForm">
+		<table>
+			<tr>
+				<td><label for="sentiment" style="padding-right: 2em;">Text: </label></td>
+				<td><input id="sentiment" />
+					<button type="submit">Go!</button></td>
+			</tr>
+			<tr>
+				<td>Sentiment:</td>
+				<td><div id="sentimentBox"></div></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>
